@@ -34,17 +34,21 @@ Three-stage pipeline:
 3. **Output** — Final decision report per network slice
 
 ## Contributors
-- [Your Name] — [Your GitHub profile link]
-- [Teammate Name] — [Link]
+- [Yahyaoui Anas] — https://github.com/anasYaha
+- [Karray Ahmed] — https://github.com/ahmed-karray
+- [Klouz Rami] — https://github.com/ramiklouz
+- [Kheder Tasnim] — https://github.com/tasnim-dev-ux
+- [Belkadhi Mustapha Aziz] — https://github.com/WorKenX306
+- [Bendhaw Zahra] — https://github.com/z-a-h-r-a
+
 
 ## Academic Context
 Developed at **Esprit School of Engineering – Tunisia**
-PIDEV – [Your Class] | 2025–2026
+PIDEV – 4 DATA | 2025–2026
 
 ## Getting Started
 ```bash
 # Clone the repository
-git clone https://github.com/[your-username]/Esprit-PIDEV-[Class]-2026-6G-SmartCity-IDS.git
 
 # Install dependencies
 pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn
