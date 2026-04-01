@@ -1,0 +1,60 @@
+# =============================================================================
+# docker-compose.monitoring.yml — Atelier 7: Monitoring Stack
+# Elasticsearch 8.x + Kibana 8.x
+#
+# Start:  docker-compose -f docker-compose.monitoring.yml up -d
+# Stop:   docker-compose -f docker-compose.monitoring.yml down
+#
+# Kibana  → http://localhost:5601
+# ES      → http://localhost:9200
+# =============================================================================
+
+version: "3.8"
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: es_6g_ids
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false      # disable auth for local dev
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\\|yellow\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.0
+    container_name: kibana_6g_ids
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status | grep -q 'available'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  es_data:
+    driver: local
+
+networks:
+  monitoring:
+    driver: bridge

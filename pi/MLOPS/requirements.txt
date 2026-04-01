@@ -1,0 +1,35 @@
+# =============================================================================
+# requirements.txt — 6G Smart City IDS MLOps
+# =============================================================================
+
+# Core ML
+numpy
+pandas
+scikit-learn
+imbalanced-learn
+xgboost
+lightgbm
+joblib
+
+# Visualisation
+matplotlib
+seaborn
+
+# MLflow (Atelier 5)
+mlflow
+
+# FastAPI / REST (Atelier 4)
+fastapi
+uvicorn[standard]
+
+# Monitoring / Elasticsearch (Atelier 7)
+elasticsearch>=8.0.0
+
+# Code quality (Atelier 3 — CI steps)
+flake8
+black
+bandit
+
+# Testing
+pytest
+httpx         # required by FastAPI test client
