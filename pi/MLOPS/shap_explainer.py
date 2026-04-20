@@ -7,12 +7,13 @@ import shap
 import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')  # Use non-GUI backend for thread safety
-import matplotlib.pyplot as plt
-import io
-import base64
-from typing import Dict, Any, List, Optional
-import warnings
+
+matplotlib.use("Agg")  # Use non-GUI backend for thread safety
+import matplotlib.pyplot as plt  # noqa: E402
+import io  # noqa: E402
+import base64  # noqa: E402
+from typing import Dict, Any, List  # noqa: E402
+import warnings  # noqa: E402
 
 warnings.filterwarnings("ignore")
 
@@ -158,8 +159,12 @@ class SHAPExplainer:
 
         for i, feat in enumerate(top_features, 1):
             direction = "increases" if feat["shap_value"] > 0 else "decreases"
-            explanation += f"{i}. {feat['feature']} (value: {feat['feature_value']:.3f})\n"
-            explanation += f"   → {direction} malicious score by {abs(feat['shap_value']):.3f}\n"
+            explanation += (
+                f"{i}. {feat['feature']} (value: {feat['feature_value']:.3f})\n"
+            )
+            explanation += (
+                f"   → {direction} malicious score by {abs(feat['shap_value']):.3f}\n"
+            )
 
         return explanation
 
@@ -257,9 +262,7 @@ class SHAPExplainer:
             print(f"Error generating force plot: {e}")
             return None
 
-    def generate_bar_plot(
-        self, feature_importance: List[Dict], top_n: int = 10
-    ) -> str:
+    def generate_bar_plot(self, feature_importance: List[Dict], top_n: int = 10) -> str:
         """
         Generate feature importance bar plot
 
@@ -279,9 +282,7 @@ class SHAPExplainer:
             features = [f["feature"] for f in top_features]
             importances = [f["importance"] for f in top_features]
 
-            colors = [
-                "red" if f["shap_value"] > 0 else "blue" for f in top_features
-            ]
+            colors = ["red" if f["shap_value"] > 0 else "blue" for f in top_features]
 
             plt.barh(features, importances, color=colors)
             plt.xlabel("SHAP Value (Impact on Prediction)")

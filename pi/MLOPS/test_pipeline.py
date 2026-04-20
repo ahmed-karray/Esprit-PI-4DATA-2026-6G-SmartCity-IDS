@@ -3,6 +3,9 @@
 import numpy as np
 import pandas as pd
 import pytest
+import joblib
+from pathlib import Path
+from shap_explainer import SHAPExplainer, get_explainer
 
 from model_pipeline import (
     FEATURE_MAP,
@@ -115,11 +118,6 @@ def test_model_path_for_uses_dataset_name():
 
 
 # SHAP Explainability Tests
-
-import joblib
-from pathlib import Path
-from shap_explainer import SHAPExplainer, get_explainer
-
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -132,10 +130,10 @@ def explainer():
 def real_model_bundle():
     """Load a real trained model for testing"""
     model_path = BASE_DIR / "lightgbm_mMTC.joblib"
-    
+
     if not model_path.exists():
         pytest.skip(f"Model file not found: {model_path}. Run 'make train' first.")
-    
+
     bundle = joblib.load(model_path)
     return bundle
 
@@ -180,7 +178,9 @@ def test_explainer_singleton():
     assert e1 is e2
 
 
-def test_explain_prediction_structure(explainer, model, preprocessor, feature_names, sample_features):
+def test_explain_prediction_structure(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that explanation has correct structure"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -199,7 +199,9 @@ def test_explain_prediction_structure(explainer, model, preprocessor, feature_na
     assert "prediction_score" in explanation
 
 
-def test_shap_values_type(explainer, model, preprocessor, feature_names, sample_features):
+def test_shap_values_type(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that SHAP values are returned as list"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -213,7 +215,9 @@ def test_shap_values_type(explainer, model, preprocessor, feature_names, sample_
     assert len(explanation["shap_values"]) > 0
 
 
-def test_feature_importance_ranking(explainer, model, preprocessor, feature_names, sample_features):
+def test_feature_importance_ranking(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that features are ranked by importance"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -233,7 +237,9 @@ def test_feature_importance_ranking(explainer, model, preprocessor, feature_name
         )
 
 
-def test_top_features_limit(explainer, model, preprocessor, feature_names, sample_features):
+def test_top_features_limit(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that top features are limited to 5"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -246,7 +252,9 @@ def test_top_features_limit(explainer, model, preprocessor, feature_names, sampl
     assert len(explanation["top_features"]) <= 5
 
 
-def test_explanation_text_generation(explainer, model, preprocessor, feature_names, sample_features):
+def test_explanation_text_generation(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that explanation text is generated"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -265,7 +273,9 @@ def test_explanation_text_generation(explainer, model, preprocessor, feature_nam
     assert "Top contributing features:" in explanation_text
 
 
-def test_prediction_score_calculation(explainer, model, preprocessor, feature_names, sample_features):
+def test_prediction_score_calculation(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that prediction score is calculated correctly"""
     explanation = explainer.explain_prediction(
         model=model,
@@ -296,7 +306,9 @@ def test_bar_plot_generation(explainer):
         assert plot.startswith("data:image/png;base64,")
 
 
-def test_explainer_caching(explainer, model, preprocessor, feature_names, sample_features):
+def test_explainer_caching(
+    explainer, model, preprocessor, feature_names, sample_features
+):
     """Test that explainers are cached per dataset"""
     # First call
     explainer.explain_prediction(
@@ -324,21 +336,21 @@ def test_multiple_datasets(explainer):
     """Test handling of multiple datasets"""
     # This test will load all available models
     datasets = ["mMTC", "URLLC", "eMBB", "TON_IoT"]
-    
+
     for dataset in datasets:
         model_path = BASE_DIR / f"lightgbm_{dataset}.joblib"
-        
+
         if not model_path.exists():
             continue  # Skip if model not trained
-        
+
         bundle = joblib.load(model_path)
         model = bundle["model"]
         preprocessor = bundle["preprocessor"]
         feature_names = bundle["features"]
-        
+
         # Create sample features (use first feature with dummy value)
         features = {feature_names[0]: 100}
-        
+
         explanation = explainer.explain_prediction(
             model=model,
             preprocessor=preprocessor,

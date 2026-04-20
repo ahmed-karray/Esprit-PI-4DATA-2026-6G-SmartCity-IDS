@@ -8,7 +8,13 @@ from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from attack_classifier import get_classifier
 from shap_explainer import get_explainer
-from database import log_prediction, get_recent_predictions, get_attack_statistics, get_predictions_by_time, get_dataset_metrics
+from database import (
+    log_prediction,
+    get_recent_predictions,
+    get_attack_statistics,
+    get_predictions_by_time,
+    get_dataset_metrics,
+)
 from drift_monitor import get_drift_monitor
 
 # Suppress sklearn feature name warnings
@@ -44,7 +50,8 @@ def load_bundle(dataset_name: str):
     model_path = MODEL_FILES[dataset_name]
     if not model_path.exists():
         raise HTTPException(
-            status_code=404, detail=f"Model file not found: {model_path.name}. Train it first."
+            status_code=404,
+            detail=f"Model file not found: {model_path.name}. Train it first.",
         )
 
     return joblib.load(model_path)
@@ -58,7 +65,7 @@ def root():
 @app.post("/predict")
 def predict(req: PredictRequest):
     start_time = time.time()
-    
+
     bundle = load_bundle(req.dataset)
 
     model = bundle["model"]
@@ -207,7 +214,9 @@ def get_attack_stats(hours: int = 24, dataset: Optional[str] = None):
 
 
 @app.get("/stats/timeline")
-def get_timeline_stats(hours: int = 24, interval_minutes: int = 60, dataset: Optional[str] = None):
+def get_timeline_stats(
+    hours: int = 24, interval_minutes: int = 60, dataset: Optional[str] = None
+):
     """Get predictions grouped by time intervals"""
     try:
         timeline = get_predictions_by_time(

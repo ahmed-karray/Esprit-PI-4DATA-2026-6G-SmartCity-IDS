@@ -56,6 +56,11 @@ pi/MLOPS/*.db
 pi/MLOPS/*.sqlite
 pi/MLOPS/*.sqlite3
 
+# Node.js (if accidentally added)
+node_modules/
+package-lock.json
+package.json
+
 # MLflow artifacts (generated during training)
 pi/MLOPS/mlruns/
 pi/MLOPS/mlflow-runs/

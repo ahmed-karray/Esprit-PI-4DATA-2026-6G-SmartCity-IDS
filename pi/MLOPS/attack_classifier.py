@@ -3,7 +3,6 @@ Attack Classification Service
 Classifies detected attacks into specific subtypes per network slice
 """
 
-import pandas as pd
 from typing import Dict, Any
 
 
@@ -119,7 +118,6 @@ class AttackClassifier:
         src_bytes = features.get("src_bytes", 0)
         dst_bytes = features.get("dst_bytes", 0)
         src_pkts = features.get("src_pkts", 0)
-        dst_pkts = features.get("dst_pkts", 0)
         duration = features.get("duration", 0)
         proto = features.get("proto", "")
         conn_state = features.get("conn_state", "")
@@ -210,18 +208,37 @@ class AttackClassifier:
             Recommended action
         """
         actions = {
-            "DDoS Attack": "Block source IP, enable rate limiting, activate DDoS mitigation",
-            "Ransomware": "Isolate affected systems, block file encryption, restore from backup",
-            "Port Scanning": "Block source IP, enable firewall rules, monitor for follow-up attacks",
-            "Data Exfiltration": "Block outbound connection, investigate data breach, alert security team",
+            "DDoS Attack": (
+                "Block source IP, enable rate limiting, " "activate DDoS mitigation"
+            ),
+            "Ransomware": (
+                "Isolate affected systems, block file encryption, "
+                "restore from backup"
+            ),
+            "Port Scanning": (
+                "Block source IP, enable firewall rules, "
+                "monitor for follow-up attacks"
+            ),
+            "Data Exfiltration": (
+                "Block outbound connection, investigate data breach, "
+                "alert security team"
+            ),
             "Backdoor": "Terminate connection, scan for malware, reset credentials",
             "Flooding Attack": "Enable traffic filtering, increase bandwidth, block source",
-            "Bandwidth Exhaustion Attack": "Implement QoS policies, throttle traffic, block source",
+            "Bandwidth Exhaustion Attack": (
+                "Implement QoS policies, throttle traffic, block source"
+            ),
             "Injection Attack": "Sanitize inputs, update WAF rules, patch vulnerabilities",
-            "Man-in-the-Middle": "Enforce encryption, verify certificates, terminate connection",
+            "Man-in-the-Middle": (
+                "Enforce encryption, verify certificates, terminate connection"
+            ),
             "Password Attack": "Lock account, enable MFA, block source IP",
-            "Latency Manipulation Attack": "Reroute traffic, investigate network path, enable monitoring",
-            "Packet Loss Attack": "Check network integrity, reroute traffic, investigate source",
+            "Latency Manipulation Attack": (
+                "Reroute traffic, investigate network path, enable monitoring"
+            ),
+            "Packet Loss Attack": (
+                "Check network integrity, reroute traffic, investigate source"
+            ),
             "Cross-Site Scripting (XSS)": "Sanitize inputs, update WAF, patch application",
             "Benign": "No action required",
         }

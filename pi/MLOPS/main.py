@@ -8,14 +8,22 @@ from model_pipeline import (
 
 
 def main():
-    parser = argparse.ArgumentParser(description="6G IDS Notebook-Faithful LightGBM runner")
+    parser = argparse.ArgumentParser(
+        description="6G IDS Notebook-Faithful LightGBM runner"
+    )
 
-    parser.add_argument("--list-data", action="store_true", help="List datasets in ../Data5G")
     parser.add_argument(
-        "--prepare", action="store_true", help="Prepare one dataset exactly like notebook"
+        "--list-data", action="store_true", help="List datasets in ../Data5G"
     )
     parser.add_argument(
-        "--train", action="store_true", help="Train LightGBM on one dataset exactly like notebook"
+        "--prepare",
+        action="store_true",
+        help="Prepare one dataset exactly like notebook",
+    )
+    parser.add_argument(
+        "--train",
+        action="store_true",
+        help="Train LightGBM on one dataset exactly like notebook",
     )
     parser.add_argument(
         "--evaluate", action="store_true", help="Evaluate saved model on one dataset"
@@ -42,7 +50,9 @@ def main():
 
     if args.prepare or args.train or args.evaluate:
         if not args.dataset:
-            raise SystemExit("Error: --dataset is required with --prepare, --train, and --evaluate")
+            raise SystemExit(
+                "Error: --dataset is required with --prepare, --train, and --evaluate"
+            )
 
     if args.prepare:
         info = prepare_data(dataset_name=args.dataset)

@@ -8,7 +8,7 @@ import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 import base64
 from io import BytesIO
@@ -26,7 +26,8 @@ st.set_page_config(
 API_URL = "http://localhost:8000"
 
 # Custom CSS
-st.markdown("""
+st.markdown(
+    """
 <style>
     .main-header {
         font-size: 2.5rem;
@@ -58,7 +59,9 @@ st.markdown("""
         border-left: 4px solid #4caf50;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 def check_api_health():
@@ -66,7 +69,7 @@ def check_api_health():
     try:
         response = requests.get(f"{API_URL}/", timeout=2)
         return response.status_code == 200
-    except:
+    except Exception:
         return False
 
 
@@ -102,7 +105,7 @@ def get_attack_statistics(hours=24, dataset=None):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -116,7 +119,7 @@ def get_timeline_data(hours=24, interval_minutes=60, dataset=None):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -127,7 +130,7 @@ def get_dataset_metrics():
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -141,7 +144,7 @@ def get_recent_predictions(limit=100, dataset=None):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -155,7 +158,7 @@ def check_drift(dataset=None):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -169,7 +172,7 @@ def check_feature_drift(dataset, hours=24, baseline_hours=168):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -183,7 +186,7 @@ def check_performance_drift(dataset, hours=24, baseline_hours=168):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -194,7 +197,7 @@ def should_retrain(dataset):
         if response.status_code == 200:
             return response.json()
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -222,7 +225,14 @@ else:
 # Navigation
 page = st.sidebar.radio(
     "Navigation",
-    ["🏠 Overview", "🔍 Live Prediction", "📊 Statistics", "🎯 SHAP Analysis", "📈 Timeline", "⚠️ Drift Monitor"],
+    [
+        "🏠 Overview",
+        "🔍 Live Prediction",
+        "📊 Statistics",
+        "🎯 SHAP Analysis",
+        "📈 Timeline",
+        "⚠️ Drift Monitor",
+    ],
 )
 
 # Dataset filter
@@ -252,7 +262,10 @@ if auto_refresh:
     st.rerun()
 
 # Main content
-st.markdown('<div class="main-header">🛡️ 6G Smart City IDS Dashboard</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-header">🛡️ 6G Smart City IDS Dashboard</div>',
+    unsafe_allow_html=True,
+)
 
 # ============================================================================
 # PAGE: OVERVIEW
@@ -277,8 +290,8 @@ if page == "🏠 Overview":
 
         with col2:
             malicious_pct = (
-                (stats['malicious_count'] / stats['total_predictions'] * 100)
-                if stats['total_predictions'] > 0
+                (stats["malicious_count"] / stats["total_predictions"] * 100)
+                if stats["total_predictions"] > 0
                 else 0
             )
             st.metric(
@@ -309,9 +322,9 @@ if page == "🏠 Overview":
 
         with col1:
             st.subheader("Attack Type Distribution")
-            if stats['attack_types']:
+            if stats["attack_types"]:
                 attack_df = pd.DataFrame(
-                    list(stats['attack_types'].items()),
+                    list(stats["attack_types"].items()),
                     columns=["Attack Type", "Count"],
                 )
                 fig = px.pie(
@@ -327,9 +340,9 @@ if page == "🏠 Overview":
 
         with col2:
             st.subheader("Severity Distribution")
-            if stats['severity_distribution']:
+            if stats["severity_distribution"]:
                 severity_df = pd.DataFrame(
-                    list(stats['severity_distribution'].items()),
+                    list(stats["severity_distribution"].items()),
                     columns=["Severity", "Count"],
                 )
                 severity_colors = {
@@ -357,10 +370,12 @@ if page == "🏠 Overview":
             metrics_df = pd.DataFrame(dataset_metrics["datasets"])
             if not metrics_df.empty:
                 st.dataframe(
-                    metrics_df.style.format({
-                        "avg_confidence": "{:.2%}",
-                        "avg_response_time": "{:.2f} ms",
-                    }),
+                    metrics_df.style.format(
+                        {
+                            "avg_confidence": "{:.2%}",
+                            "avg_response_time": "{:.2f} ms",
+                        }
+                    ),
                     use_container_width=True,
                 )
 
@@ -375,10 +390,46 @@ elif page == "🔍 Live Prediction":
 
     # Feature definitions
     feature_configs = {
-        "mMTC": ["TotPkts", "Rate", "SrcGap", "DstGap", "Dur", "Load", "Loss", "TcpRtt"],
-        "URLLC": ["TcpRtt", "SynAck", "AckDat", "Loss", "Dur", "Rate", "TotPkts", "TotBytes"],
-        "eMBB": ["Dur", "TotPkts", "TotBytes", "Rate", "Load", "Loss", "pLoss", "TcpRtt"],
-        "TON_IoT": ["src_bytes", "dst_bytes", "src_pkts", "dst_pkts", "duration", "proto", "conn_state", "service"],
+        "mMTC": [
+            "TotPkts",
+            "Rate",
+            "SrcGap",
+            "DstGap",
+            "Dur",
+            "Load",
+            "Loss",
+            "TcpRtt",
+        ],
+        "URLLC": [
+            "TcpRtt",
+            "SynAck",
+            "AckDat",
+            "Loss",
+            "Dur",
+            "Rate",
+            "TotPkts",
+            "TotBytes",
+        ],
+        "eMBB": [
+            "Dur",
+            "TotPkts",
+            "TotBytes",
+            "Rate",
+            "Load",
+            "Loss",
+            "pLoss",
+            "TcpRtt",
+        ],
+        "TON_IoT": [
+            "src_bytes",
+            "dst_bytes",
+            "src_pkts",
+            "dst_pkts",
+            "duration",
+            "proto",
+            "conn_state",
+            "service",
+        ],
     }
 
     features = {}
@@ -411,22 +462,29 @@ elif page == "🔍 Live Prediction":
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                pred_class = "alert-critical" if result["prediction"] == "Malicious" else "alert-low"
+                pred_class = (
+                    "alert-critical"
+                    if result["prediction"] == "Malicious"
+                    else "alert-low"
+                )
                 st.markdown(
-                    f'<div class="metric-card {pred_class}"><h3>Prediction</h3><h2>{result["prediction"]}</h2></div>',
+                    f'<div class="metric-card {pred_class}"><h3>Prediction</h3>'
+                    f'<h2>{result["prediction"]}</h2></div>',
                     unsafe_allow_html=True,
                 )
 
             with col2:
                 severity_class = f"alert-{result['severity'].lower()}"
                 st.markdown(
-                    f'<div class="metric-card {severity_class}"><h3>Attack Type</h3><h2>{result["attack_type"]}</h2></div>',
+                    f'<div class="metric-card {severity_class}"><h3>Attack Type</h3>'
+                    f'<h2>{result["attack_type"]}</h2></div>',
                     unsafe_allow_html=True,
                 )
 
             with col3:
                 st.markdown(
-                    f'<div class="metric-card"><h3>Confidence</h3><h2>{result["confidence"]:.1%}</h2></div>',
+                    f'<div class="metric-card"><h3>Confidence</h3>'
+                    f'<h2>{result["confidence"]:.1%}</h2></div>',
                     unsafe_allow_html=True,
                 )
 
@@ -439,11 +497,13 @@ elif page == "🔍 Live Prediction":
             with col1:
                 st.write(f"**Alert Status:** {result['alert_status']}")
                 st.write(f"**Severity:** {result['severity']}")
-                st.write(f"**Response Time:** {result.get('response_time_ms', 0):.2f} ms")
+                st.write(
+                    f"**Response Time:** {result.get('response_time_ms', 0):.2f} ms"
+                )
 
             with col2:
-                st.write(f"**Recommended Action:**")
-                st.info(result['recommended_action'])
+                st.write("**Recommended Action:**")
+                st.info(result["recommended_action"])
 
             # SHAP Explanation
             if explain and "shap_explanation" in result:
@@ -495,8 +555,8 @@ elif page == "📊 Statistics":
 
         with col2:
             attack_rate = (
-                (stats['malicious_count'] / stats['total_predictions'] * 100)
-                if stats['total_predictions'] > 0
+                (stats["malicious_count"] / stats["total_predictions"] * 100)
+                if stats["total_predictions"] > 0
                 else 0
             )
             st.metric("Attack Rate", f"{attack_rate:.1f}%")
@@ -507,10 +567,10 @@ elif page == "📊 Statistics":
         st.divider()
 
         # Attack types table
-        if stats['attack_types']:
+        if stats["attack_types"]:
             st.subheader("Attack Types Breakdown")
             attack_df = pd.DataFrame(
-                list(stats['attack_types'].items()),
+                list(stats["attack_types"].items()),
                 columns=["Attack Type", "Count"],
             )
             attack_df["Percentage"] = (
@@ -529,7 +589,14 @@ elif page == "📊 Statistics":
         if recent and recent.get("predictions"):
             df = pd.DataFrame(recent["predictions"])
             # Select relevant columns
-            display_cols = ["timestamp", "dataset", "prediction", "attack_type", "severity", "confidence"]
+            display_cols = [
+                "timestamp",
+                "dataset",
+                "prediction",
+                "attack_type",
+                "severity",
+                "confidence",
+            ]
             if all(col in df.columns for col in display_cols):
                 st.dataframe(
                     df[display_cols].head(20),
@@ -542,12 +609,14 @@ elif page == "📊 Statistics":
 elif page == "🎯 SHAP Analysis":
     st.header("SHAP Explainability Analysis")
 
-    st.info("💡 Use the Live Prediction page to generate SHAP explanations for individual predictions")
+    st.info(
+        "💡 Use the Live Prediction page to generate SHAP explanations for individual predictions"
+    )
 
     st.write("""
     ### What is SHAP?
 
-    SHAP (SHapley Additive exPlanations) provides interpretable explanations for model predictions by:
+    SHAP SHapley Additive exPlanations provides interpretable explanations for model predictions by:
 
     - **Feature Attribution**: Shows how much each feature contributed to the prediction
     - **Transparency**: Makes black-box models interpretable
@@ -574,7 +643,9 @@ elif page == "🎯 SHAP Analysis":
 elif page == "📈 Timeline":
     st.header("Prediction Timeline")
 
-    timeline_data = get_timeline_data(hours=hours, interval_minutes=60, dataset=dataset_param)
+    timeline_data = get_timeline_data(
+        hours=hours, interval_minutes=60, dataset=dataset_param
+    )
 
     if timeline_data and timeline_data.get("timeline"):
         df = pd.DataFrame(timeline_data["timeline"])
@@ -640,7 +711,7 @@ elif page == "⚠️ Drift Monitor":
     st.header("Concept Drift Monitoring")
 
     st.info("""
-    **Concept Drift** occurs when the statistical properties of data change over time, 
+    **Concept Drift** occurs when the statistical properties of data change over time,
     which can degrade model performance. This page monitors:
     - **Feature Drift**: Changes in input feature distributions
     - **Performance Drift**: Changes in model confidence and prediction patterns
@@ -683,7 +754,9 @@ elif page == "⚠️ Drift Monitor":
 
                 if feature_drift.get("drift_detected"):
                     st.warning(
-                        f"⚠️ Drift detected in {feature_drift.get('drift_count', 0)} out of {feature_drift.get('total_features', 0)} features"
+                        f"⚠️ Drift detected in "
+                        f"{feature_drift.get('drift_count', 0)} "
+                        f"out of {feature_drift.get('total_features', 0)} features"
                     )
 
                     # Show drifted features
@@ -695,7 +768,9 @@ elif page == "⚠️ Drift Monitor":
                     # Feature drift details
                     if feature_drift.get("feature_drift_details"):
                         st.write("**Detailed Analysis:**")
-                        drift_df = pd.DataFrame(feature_drift["feature_drift_details"]).T
+                        drift_df = pd.DataFrame(
+                            feature_drift["feature_drift_details"]
+                        ).T
                         drift_df = drift_df.sort_values("ks_statistic", ascending=False)
 
                         # Format and display

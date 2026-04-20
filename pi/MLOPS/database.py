@@ -5,7 +5,6 @@ Uses SQLite for simplicity, can be upgraded to PostgreSQL for production
 
 import sqlite3
 import json
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from contextlib import contextmanager
@@ -56,22 +55,22 @@ def init_database():
 
         # Create indexes for common queries
         cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_timestamp 
+            CREATE INDEX IF NOT EXISTS idx_timestamp
             ON predictions(timestamp DESC)
         """)
 
         cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_dataset 
+            CREATE INDEX IF NOT EXISTS idx_dataset
             ON predictions(dataset)
         """)
 
         cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_prediction 
+            CREATE INDEX IF NOT EXISTS idx_prediction
             ON predictions(prediction)
         """)
 
         cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_attack_type 
+            CREATE INDEX IF NOT EXISTS idx_attack_type
             ON predictions(attack_type)
         """)
 
@@ -150,7 +149,9 @@ def log_prediction(
         return cursor.lastrowid
 
 
-def get_recent_predictions(limit: int = 100, dataset: Optional[str] = None) -> List[Dict]:
+def get_recent_predictions(
+    limit: int = 100, dataset: Optional[str] = None
+) -> List[Dict]:
     """Get recent predictions"""
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -158,9 +159,9 @@ def get_recent_predictions(limit: int = 100, dataset: Optional[str] = None) -> L
         if dataset:
             cursor.execute(
                 """
-                SELECT * FROM predictions 
+                SELECT * FROM predictions
                 WHERE dataset = ?
-                ORDER BY timestamp DESC 
+                ORDER BY timestamp DESC
                 LIMIT ?
             """,
                 (dataset, limit),
@@ -168,8 +169,8 @@ def get_recent_predictions(limit: int = 100, dataset: Optional[str] = None) -> L
         else:
             cursor.execute(
                 """
-                SELECT * FROM predictions 
-                ORDER BY timestamp DESC 
+                SELECT * FROM predictions
+                ORDER BY timestamp DESC
                 LIMIT ?
             """,
                 (limit,),
@@ -206,19 +207,21 @@ def get_attack_statistics(
         # Malicious vs Benign
         cursor.execute(
             f"""
-            SELECT prediction, COUNT(*) as count 
+            SELECT prediction, COUNT(*) as count
             FROM predictions {where_clause}
             GROUP BY prediction
         """,
             params,
         )
-        prediction_counts = {row["prediction"]: row["count"] for row in cursor.fetchall()}
+        prediction_counts = {
+            row["prediction"]: row["count"] for row in cursor.fetchall()
+        }
 
         # Attack types
         cursor.execute(
             f"""
-            SELECT attack_type, COUNT(*) as count 
-            FROM predictions 
+            SELECT attack_type, COUNT(*) as count
+            FROM predictions
             {where_clause} AND prediction = 'Malicious'
             GROUP BY attack_type
             ORDER BY count DESC
@@ -230,8 +233,8 @@ def get_attack_statistics(
         # Severity distribution
         cursor.execute(
             f"""
-            SELECT severity, COUNT(*) as count 
-            FROM predictions 
+            SELECT severity, COUNT(*) as count
+            FROM predictions
             {where_clause} AND prediction = 'Malicious'
             GROUP BY severity
             ORDER BY count DESC
@@ -243,7 +246,7 @@ def get_attack_statistics(
         # Average confidence
         cursor.execute(
             f"""
-            SELECT AVG(confidence) as avg_confidence 
+            SELECT AVG(confidence) as avg_confidence
             FROM predictions {where_clause}
         """,
             params,
@@ -276,8 +279,8 @@ def get_predictions_by_time(
 
         cursor.execute(
             f"""
-            SELECT 
-                strftime('%Y-%m-%d %H:%M', timestamp, 
+            SELECT
+                strftime('%Y-%m-%d %H:%M', timestamp,
                     '-' || (strftime('%M', timestamp) % ?) || ' minutes') as time_bucket,
                 COUNT(*) as total,
                 SUM(CASE WHEN prediction = 'Malicious' THEN 1 ELSE 0 END) as malicious,
@@ -300,7 +303,7 @@ def get_dataset_metrics() -> List[Dict]:
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT 
+            SELECT
                 dataset,
                 COUNT(*) as total_predictions,
                 SUM(CASE WHEN prediction = 'Malicious' THEN 1 ELSE 0 END) as malicious_count,
@@ -322,7 +325,7 @@ def clear_old_predictions(days: int = 30):
 
         cursor.execute(
             """
-            DELETE FROM predictions 
+            DELETE FROM predictions
             WHERE timestamp < datetime('now', '-' || ? || ' days')
         """,
             (days,),

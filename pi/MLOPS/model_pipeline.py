@@ -49,9 +49,27 @@ DATASET_FILES = {
 # -----------------------------
 # Exact notebook feature sets
 # -----------------------------
-embb_features = ["Dur", "TotPkts", "TotBytes", "Rate", "Load", "Loss", "pLoss", "TcpRtt"]
+embb_features = [
+    "Dur",
+    "TotPkts",
+    "TotBytes",
+    "Rate",
+    "Load",
+    "Loss",
+    "pLoss",
+    "TcpRtt",
+]
 mmtc_features = ["TotPkts", "Rate", "SrcGap", "DstGap", "Dur", "Load", "Loss", "TcpRtt"]
-urllc_features = ["TcpRtt", "SynAck", "AckDat", "Loss", "Dur", "Rate", "TotPkts", "TotBytes"]
+urllc_features = [
+    "TcpRtt",
+    "SynAck",
+    "AckDat",
+    "Loss",
+    "Dur",
+    "Rate",
+    "TotPkts",
+    "TotBytes",
+]
 toniot_features = [
     "src_bytes",
     "dst_bytes",
@@ -311,7 +329,10 @@ def train_model(dataset_name=None):
         model.fit(
             X_train_proc,
             y_train,
-            callbacks=[lgb.early_stopping(30, verbose=False), lgb.log_evaluation(period=-1)],
+            callbacks=[
+                lgb.early_stopping(30, verbose=False),
+                lgb.log_evaluation(period=-1),
+            ],
             eval_set=[(X_test_proc, y_test)],
         )
 

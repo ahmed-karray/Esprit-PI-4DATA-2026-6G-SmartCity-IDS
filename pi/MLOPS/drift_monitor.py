@@ -6,8 +6,8 @@ Detects data drift and model performance degradation
 import numpy as np
 import pandas as pd
 from scipy import stats
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Dict, Optional, Tuple
 from pathlib import Path
 import joblib
 import json
@@ -81,7 +81,7 @@ class DriftMonitor:
             cursor.execute(
                 """
                 SELECT features FROM predictions
-                WHERE dataset = ? 
+                WHERE dataset = ?
                 AND timestamp >= datetime('now', '-' || ? || ' hours')
             """,
                 (dataset, hours),
@@ -133,16 +133,19 @@ class DriftMonitor:
                         drift_results[col] = {
                             "ks_statistic": ks_stat,
                             "p_value": p_value,
-                            "drift_detected": p_value < self.drift_thresholds["ks_test"],
+                            "drift_detected": p_value
+                            < self.drift_thresholds["ks_test"],
                             "recent_mean": float(recent_vals.mean()),
                             "baseline_mean": float(baseline_vals.mean()),
-                            "mean_change_pct": float(
-                                (recent_vals.mean() - baseline_vals.mean())
-                                / baseline_vals.mean()
-                                * 100
-                            )
-                            if baseline_vals.mean() != 0
-                            else 0.0,
+                            "mean_change_pct": (
+                                float(
+                                    (recent_vals.mean() - baseline_vals.mean())
+                                    / baseline_vals.mean()
+                                    * 100
+                                )
+                                if baseline_vals.mean() != 0
+                                else 0.0
+                            ),
                         }
 
                         if p_value < self.drift_thresholds["ks_test"]:
@@ -179,7 +182,7 @@ class DriftMonitor:
             # Recent performance
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     AVG(confidence) as avg_confidence,
                     COUNT(*) as total,
                     SUM(CASE WHEN prediction = 'Malicious' THEN 1 ELSE 0 END) as malicious,
@@ -195,7 +198,7 @@ class DriftMonitor:
             # Baseline performance
             cursor.execute(
                 """
-                SELECT 
+                SELECT
                     AVG(confidence) as avg_confidence,
                     COUNT(*) as total,
                     SUM(CASE WHEN prediction = 'Malicious' THEN 1 ELSE 0 END) as malicious,
@@ -209,7 +212,12 @@ class DriftMonitor:
             )
             baseline = cursor.fetchone()
 
-            if not recent or not baseline or recent["total"] == 0 or baseline["total"] == 0:
+            if (
+                not recent
+                or not baseline
+                or recent["total"] == 0
+                or baseline["total"] == 0
+            ):
                 return {
                     "drift_detected": False,
                     "reason": "Insufficient data for performance drift detection",
@@ -218,12 +226,17 @@ class DriftMonitor:
             # Calculate metrics
             recent_conf = recent["avg_confidence"] or 0.0
             baseline_conf = baseline["avg_confidence"] or 0.0
-            conf_change = (recent_conf - baseline_conf) / baseline_conf if baseline_conf > 0 else 0
+            conf_change = (
+                (recent_conf - baseline_conf) / baseline_conf
+                if baseline_conf > 0
+                else 0
+            )
 
             recent_malicious_rate = recent["malicious"] / recent["total"]
             baseline_malicious_rate = baseline["malicious"] / baseline["total"]
             malicious_rate_change = (
-                (recent_malicious_rate - baseline_malicious_rate) / baseline_malicious_rate
+                (recent_malicious_rate - baseline_malicious_rate)
+                / baseline_malicious_rate
                 if baseline_malicious_rate > 0
                 else 0
             )
@@ -272,10 +285,9 @@ class DriftMonitor:
                 ds, hours=24, baseline_hours=168
             )
 
-            drift_detected = (
-                feature_drift.get("drift_detected", False)
-                or performance_drift.get("drift_detected", False)
-            )
+            drift_detected = feature_drift.get(
+                "drift_detected", False
+            ) or performance_drift.get("drift_detected", False)
 
             # Generate recommendations
             recommendations = []
@@ -291,7 +303,9 @@ class DriftMonitor:
 
             if performance_drift.get("malicious_rate_drift"):
                 recommendations.append("Significant change in malicious traffic rate")
-                recommendations.append("Review attack patterns and update detection rules")
+                recommendations.append(
+                    "Review attack patterns and update detection rules"
+                )
 
             if not drift_detected:
                 recommendations.append("No significant drift detected")
@@ -325,11 +339,16 @@ class DriftMonitor:
 
         # Retrain if significant feature drift
         if feature_drift.get("drift_count", 0) >= 3:
-            return True, f"Significant feature drift detected in {feature_drift['drift_count']} features"
+            return (
+                True,
+                f"Significant feature drift detected in {feature_drift['drift_count']} features",
+            )
 
         # Retrain if confidence dropped significantly
         if performance_drift.get("confidence_drift"):
-            conf_change = performance_drift.get("metrics", {}).get("confidence_change_pct", 0)
+            conf_change = performance_drift.get("metrics", {}).get(
+                "confidence_change_pct", 0
+            )
             return True, f"Model confidence dropped by {abs(conf_change):.1f}%"
 
         # Retrain if malicious rate changed dramatically
@@ -376,7 +395,9 @@ class DriftMonitor:
                     dataset,
                     drift_summary.get("drift_detected", False),
                     drift_summary.get("feature_drift", {}).get("drift_count", 0),
-                    drift_summary.get("performance_drift", {}).get("confidence_drift", False),
+                    drift_summary.get("performance_drift", {}).get(
+                        "confidence_drift", False
+                    ),
                     drift_summary.get("performance_drift", {}).get(
                         "malicious_rate_drift", False
                     ),
