@@ -322,11 +322,58 @@ a {
   color: rgba(203, 213, 225, 0.72);
 }
 
-.login-hero-title {
+.login-hero-logo {
   margin: 28px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
   max-width: 640px;
+}
+
+.login-hero-logo-icon {
+  width: 74px;
+  height: 74px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 201, 143, 0.12);
+  border: 1px solid rgba(30, 201, 143, 0.18);
+  box-shadow: 0 14px 30px rgba(30, 201, 143, 0.16);
+  flex-shrink: 0;
+}
+
+.login-hero-logo-text {
+  min-width: 0;
+}
+
+.login-hero-logo-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.06em;
   font-size: clamp(2.8rem, 5vw, 4.2rem);
-  line-height: 1.08;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.login-hero-logo-name .iot {
+  color: #28c98b;
+  font-weight: 800;
+}
+
+.login-hero-logo-name .inel {
+  color: #ddeeff;
+  font-weight: 400;
+}
+
+.login-hero-logo-sub {
+  margin-top: 8px;
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #67d4ff;
 }
 
 .login-hero-copy {
@@ -613,8 +660,22 @@ a {
     padding: 24px;
   }
 
-  .login-hero-title {
+  .login-hero-logo {
+    gap: 14px;
+  }
+
+  .login-hero-logo-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .login-hero-logo-name {
     font-size: 2.4rem;
+  }
+
+  .login-hero-logo-sub {
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
   }
 
   .login-panel-title {

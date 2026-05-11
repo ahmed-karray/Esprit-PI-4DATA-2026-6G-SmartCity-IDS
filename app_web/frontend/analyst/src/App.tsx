@@ -619,26 +619,14 @@ function LoginView({
     <main className="login-shell">
       <div className="login-grid">
         <section className="login-card login-hero">
-          <a href="/" className="inline-flex items-center gap-3" style={{ textDecoration: 'none', width: 'fit-content' }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 16,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(30, 201, 143, 0.12)',
-                border: '1px solid rgba(30, 201, 143, 0.18)',
-                boxShadow: '0 14px 30px rgba(30, 201, 143, 0.16)',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <div className="login-badge mt-6">HEXAMIND SECURITY</div>
+          <a href="http://localhost:8010/" className="login-hero-logo" aria-label="IoTinel Security Platform" style={{ textDecoration: 'none' }}>
+            <div className="login-hero-logo-icon">
+              <svg width="58" height="58" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
                 <rect width="42" height="42" rx="12" fill="#0a2a1e" />
-                <rect width="42" height="42" rx="12" fill="url(#analystLoginLogoGrad)" opacity="0.7" />
+                <rect width="42" height="42" rx="12" fill="url(#analystHeroLogoGrad)" opacity="0.7" />
                 <defs>
-                  <linearGradient id="analystLoginLogoGrad" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="analystHeroLogoGrad" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stopColor="#1ec98f" />
                     <stop offset="100%" stopColor="#0fa872" />
                   </linearGradient>
@@ -649,16 +637,14 @@ function LoginView({
                 <circle cx="22.2" cy="19.8" r="0.8" fill="#1ec98f" />
               </svg>
             </div>
-            <div>
-              <div className="text-3xl font-semibold leading-none">
-                <span style={{ color: '#1ec98f', fontWeight: 800 }}>IoT</span>
-                <span style={{ color: '#b8d8f4', fontWeight: 400 }}>inel</span>
+            <div className="login-hero-logo-text">
+              <div className="login-hero-logo-name">
+                <span className="iot">IoT</span>
+                <span className="inel">inel</span>
               </div>
-              <div className="mt-1 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Security Platform</div>
+              <div className="login-hero-logo-sub">Security Platform</div>
             </div>
           </a>
-          <div className="login-badge mt-6">HEXAMIND SECURITY</div>
-          <h1 className="login-hero-title">IOTinel for 6G Smart Cities</h1>
           <p className="login-hero-copy">
             One mission-critical platform for live intrusion detection, model operations, drift monitoring, and secure administration.
           </p>
